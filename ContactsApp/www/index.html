@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Contacts App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" />
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="cordova.js"></script>
+</head>
+
+<body>
+	<script type="text/javascript">
+		function saveContactClicked() {
+			// create a new contact object
+			var contact = navigator.contacts.create();
+			contact.displayName = $("#displayName").val();
+			contact.nickname = $("#nickName").val(); // specify both to support all devices
+
+			// populate some fields
+			var name = new ContactName();
+			name.givenName = $("#givenName").val();
+			name.familyName = $("#familyName").val();
+			contact.name = name;
+			var phoneNumbers = [];
+			phoneNumbers[0] = new ContactField('work', $("#workTel").val(),
+					false);
+			phoneNumbers[1] = new ContactField('mobile', $("#mobileTel").val(),
+					true); // preferred number
+			phoneNumbers[2] = new ContactField('home', $("#homeTel").val(),
+					false);
+			contact.phoneNumbers = phoneNumbers;
+			// save to device
+			contact.save(onSaveSuccess, onSaveError);
+		}
+		function onSaveSuccess(contact) {
+			alert("Save Success");
+		}
+
+		function onSaveError(contactError) {
+			alert("Error = " + contactError.code);
+		}
+		function findContacts() {
+			navigator.contacts.find([ "*" ], onFindSuccess, onFindError);
+		}
+		function onFindSuccess(contacts) {
+			$.each(contacts, function(index, contact) {
+				var phone = "";
+				try {
+					$.each(contact.phoneNumbers, function(index, phoneNumber) {
+						if (phoneNumber.type.valueOf() == "mobile") {
+							phone = phoneNumber.value;
+						}
+					});
+				} catch (e) {
+
+				}
+				$("#listView").append(
+						"<li>" + contact.displayName + " " + phone + "</li>");
+			});
+			$("#listView").listview('refresh');
+		}
+		function onFindError(e) {
+			alert("Error = " + e);
+		}
+	</script>
+	<div data-role="page" id="home">
+		<div data-role="header" style="">My Contacts</div>
+		<div role="main" class="ui-content"></div>
+		<div data-role="footer">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#home" data-icon="home" class="ui-btn-active">Home</a></li>
+					<li><a href="#save" data-icon="grid">Save</a></li>
+					<li><a href="#find" data-icon="search"
+						onclick="findContacts();">Find</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div data-role="page" id="save">
+		<div data-role="header" style="">My Contacts</div>
+		<div role="main" class="ui-content">
+
+			<form>
+				<h3 class="ui-bar ui-bar-a">Contact Name</h3>
+				<div class="ui-body">
+					<label for="text-1">Display Name:</label> <input type="text"
+						name="text-1" id="displayName" value=""> <label
+						for="text-3">Nick Name:</label> <input type="text"
+						data-clear-btn="true" name="text-3" id="nickName" value="">
+				</div>
+				<h3 class="ui-bar ui-bar-a">Full Name</h3>
+				<div class="ui-body">
+					<label for="text-1">Given Name:</label> <input type="text"
+						name="text-1" id="givenName" value=""> <label for="text-3">Family
+						Name:</label> <input type="text" data-clear-btn="true" name="text-3"
+						id="familyName" value="">
+				</div>
+				<h3 class="ui-bar ui-bar-a">Phone Numbers</h3>
+				<div class="ui-body">
+					<label for="text-1">Work Tel:</label> <input type="text"
+						name="text-1" id="workTel" value=""> <label for="text-3">Mobile
+						Tel:</label> <input type="text" data-clear-btn="true" name="text-3"
+						id="mobileTel" value=""> <label for="text-3">Home
+						Tel:</label> <input type="text" data-clear-btn="true" name="text-3"
+						id="homeTel" value="">
+				</div>
+				<button class="ui-btn" onclick="saveContactClicked();">Save
+					Contact</button>
+			</form>
+		</div>
+		<div data-role="footer">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#home" data-icon="home">Home</a></li>
+					<li><a href="#save" data-icon="grid" class="ui-btn-active">Save</a></li>
+					<li><a href="#find" data-icon="search"
+						onclick="findContacts();">Find</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div data-role="page" id="find">
+		<div data-role="header" style="">My Contacts</div>
+		<div role="main" class="ui-content">
+			<ul id="listView" data-role="listview" data-autodividers="true"
+				data-filter="true" data-inset="true">
+
+			</ul>
+		</div>
+		<div data-role="footer">
+			<div data-role="navbar">
+				<ul>
+					<li><a href="#home" data-icon="home">Home</a></li>
+					<li><a href="#save" data-icon="grid">Save</a></li>
+					<li><a href="#find" data-icon="search" class="ui-btn-active"
+						onclick="findContacts();">Find</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
